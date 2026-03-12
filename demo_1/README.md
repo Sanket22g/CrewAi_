@@ -10,6 +10,87 @@ The final blog post is saved automatically to `blog_output.txt`.
 
 ---
 
+## Four Pillars of CrewAI
+
+CrewAI is built on four core concepts. Every project you build will revolve around these four pillars:
+
+### 1. Agent
+An **Agent** is an autonomous AI unit with a specific **role**, **goal**, and **backstory**.
+It knows what it is supposed to do and acts accordingly.
+
+```python
+@agent
+def blog_writer_agent(self) -> Agent:
+    return Agent(config=self.agents_config["blog_writer_agent"])
+```
+
+- **Role** — what the agent is (e.g., "Expert Blog Writer")
+- **Goal** — what the agent wants to achieve
+- **Backstory** — gives the agent personality and context so it behaves more accurately
+
+In this project: `report_generator_agent` and `blog_writer_agent` are the two agents.
+
+---
+
+### 2. Task
+A **Task** is a specific piece of work assigned to an agent.
+It defines **what needs to be done**, the **expected output**, and **which agent** should do it.
+
+```python
+@task
+def blog_task(self) -> Task:
+    return Task(
+        config=self.tasks_config["blog_task"],
+        output_file="blog_output.txt"
+    )
+```
+
+- **Description** — the instructions for the task
+- **Expected Output** — what a completed task looks like
+- **Agent** — which agent is responsible
+- **output_file** *(optional)* — saves the result directly to a file
+
+In this project: `report_task` and `blog_task` are the two tasks.
+
+---
+
+### 3. Crew
+A **Crew** is the **team** — it groups agents and tasks together and manages how they work.
+It is the central coordinator of the whole pipeline.
+
+```python
+@crew
+def crew(self) -> Crew:
+    return Crew(
+        agents=self.agents,
+        tasks=self.tasks,
+        process=Process.sequential,
+        verbose=True
+    )
+```
+
+- Holds the list of all **agents** and **tasks**
+- Decides the **process** (sequential or hierarchical)
+- `verbose=True` prints step-by-step execution logs
+
+---
+
+### 4. Process
+A **Process** defines the **order and strategy** in which tasks are executed by the crew.
+
+| Process | How it works |
+|---|---|
+| `Process.sequential` | Tasks run one after another in order |
+| `Process.hierarchical` | A manager agent delegates tasks to other agents |
+
+In this project, `Process.sequential` is used — the **report is generated first**, then the **blog post is written**.
+
+```python
+process=Process.sequential
+```
+
+---
+
 ## Project Structure
 
 ```
