@@ -1,0 +1,15 @@
+report_task:
+  description: >
+    Generate a comprehensive report on a specific {topic}, including an introduction, main content, and conclusion.
+    the word count should be between 1000 and 1500 words.
+  expected_output: >
+    A well-structured and informative report on {topic} that provides valuable insights and analysis.
+  agent: report_generator_agent
+
+blog_task:
+  description: >
+    Write an engaging and informative blog post on a specific {topic}, including an introduction, main content, and conclusion.
+    the word count should be between 800 and 1200 words.
+  expected_output: >
+    An engaging and informative blog post on {topic} that is optimized for SEO and resonates with readers.
+  agent: blog_writer_agent
