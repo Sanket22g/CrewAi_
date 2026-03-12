@@ -1,53 +1,134 @@
-# Demo1 Crew
+# demo_1 — CrewAI Blog & Report Generator
 
-Welcome to the Demo1 Crew project, powered by [crewAI](https://crewai.com). This template is designed to help you set up a multi-agent AI system with ease, leveraging the powerful and flexible framework provided by crewAI. Our goal is to enable your agents to collaborate effectively on complex tasks, maximizing their collective intelligence and capabilities.
+## What This Project Does
 
-## Installation
+This is a **CrewAI** project that uses two AI agents working sequentially to:
+1. **Generate a research report** on a given topic
+2. **Write a blog post** based on that topic
 
-Ensure you have Python >=3.10 <3.14 installed on your system. This project uses [UV](https://docs.astral.sh/uv/) for dependency management and package handling, offering a seamless setup and execution experience.
+The final blog post is saved automatically to `blog_output.txt`.
 
-First, if you haven't already, install uv:
+---
 
-```bash
-pip install uv
+## Project Structure
+
+```
+demo_1/
+├── knowledge/
+│   └── user_preference.txt       # User context (name, role, interests)
+├── src/demo_1/
+│   ├── crew.py                   # Defines agents, tasks, and the crew
+│   ├── main.py                   # Entry point — runs the crew via kickoff()
+│   └── config/
+│       ├── agents.yaml           # Agent roles, goals, and backstories
+│       └── tasks.yaml            # Task descriptions and expected outputs
+├── blog_output.txt               # Auto-generated output file
+└── pyproject.toml                # Project dependencies
 ```
 
-Next, navigate to your project directory and install the dependencies:
+---
 
-(Optional) Lock the dependencies and install them by using the CLI command:
-```bash
-crewai install
+## Agents Defined (`agents.yaml`)
+
+| Agent | Role | Goal |
+|---|---|---|
+| `report_generator_agent` | Expert report generator | Creates a 1000–1500 word structured report on the topic |
+| `blog_writer_agent` | Expert blog writer | Writes an 800–1200 word SEO-optimized blog post on the topic |
+
+---
+
+## Tasks Defined (`tasks.yaml`)
+
+| Task | Agent | Output |
+|---|---|---|
+| `report_task` | `report_generator_agent` | A well-structured report with intro, body, and conclusion |
+| `blog_task` | `blog_writer_agent` | An engaging blog post saved to `blog_output.txt` |
+
+---
+
+## What is `kickoff()`?
+
+`kickoff()` is the **CrewAI method that starts the entire crew execution**.
+
+```python
+Demo1().crew().kickoff(inputs=inputs)
 ```
-### Customizing
 
-**Add your `OPENAI_API_KEY` into the `.env` file**
+- It takes an `inputs` dictionary (e.g. `{'topic': 'AI agents for brain computer interfaces'}`)
+- It passes those inputs to all agents and tasks that use `{topic}` as a placeholder
+- It runs all tasks **sequentially** (one after another) as defined by `Process.sequential`
+- Once done, it returns the final output and saves `blog_output.txt` to disk
 
-- Modify `src/demo_1/config/agents.yaml` to define your agents
-- Modify `src/demo_1/config/tasks.yaml` to define your tasks
-- Modify `src/demo_1/crew.py` to add your own logic, tools and specific args
-- Modify `src/demo_1/main.py` to add custom inputs for your agents and tasks
+Think of `kickoff()` as pressing the **"Start"** button for your multi-agent pipeline.
 
-## Running the Project
+---
 
-To kickstart your crew of AI agents and begin task execution, run this from the root folder of your project:
+## Changes Made in This Project
+
+### 1. Added Two Custom Agents (`crew.py`)
+- `report_generator_agent` — generates a detailed research report
+- `blog_writer_agent` — writes a blog post based on the same topic
+
+### 2. Added Two Custom Tasks (`crew.py`)
+- `report_task` — assigned to the report agent
+- `blog_task` — assigned to the blog agent, with `output_file="blog_output.txt"` so the result is saved to disk automatically
+
+### 3. Sequential Process
+- Set `process=Process.sequential` so the report is generated **first**, then the blog post is written in order
+
+### 4. Dynamic Topic via `inputs`
+- In `main.py`, the topic is passed dynamically:
+  ```python
+  inputs = {'topic': 'AI agents for brain computer interfaces with writing code'}
+  ```
+- The `{topic}` placeholder in `agents.yaml` and `tasks.yaml` is replaced at runtime
+- You can change the topic without editing any config files
+
+### 5. Knowledge File (`knowledge/user_preference.txt`)
+- Added user context so agents are aware of who they are working for:
+  ```
+  User name is John Doe.
+  User is an AI Engineer.
+  User is interested in AI Agents.
+  User is based in San Francisco, California.
+  ```
+
+---
+
+## How to Run
 
 ```bash
-$ crewai run
+# Step 1 — Activate the virtual environment
+.venv\Scripts\Activate.ps1
+
+# Step 2 — Add your OpenAI API key to .env
+# OPENAI_API_KEY=your_key_here
+
+# Step 3 — Run the crew
+crewai run
 ```
 
-This command initializes the demo_1 Crew, assembling the agents and assigning them tasks as defined in your configuration.
+The blog post output will be saved to `blog_output.txt`.
 
-This example, unmodified, will run the create a `report.md` file with the output of a research on LLMs in the root folder.
+---
 
-## Understanding Your Crew
+## How to Change the Topic
 
-The demo_1 Crew is composed of multiple AI agents, each with unique roles, goals, and tools. These agents collaborate on a series of tasks, defined in `config/tasks.yaml`, leveraging their collective skills to achieve complex objectives. The `config/agents.yaml` file outlines the capabilities and configurations of each agent in your crew.
+Edit the `inputs` dictionary in `src/demo_1/main.py`:
 
-## Support
+```python
+inputs = {
+    'topic': 'Your new topic here',
+}
+```
 
-For support, questions, or feedback regarding the Demo1 Crew or crewAI.
-- Visit our [documentation](https://docs.crewai.com)
-- Reach out to us through our [GitHub repository](https://github.com/joaomdmoura/crewai)
+---
+
+## Requirements
+
+- Python >= 3.10
+- [crewai](https://github.com/joaomdmoura/crewai)
+- OpenAI API key (set in `.env` as `OPENAI_API_KEY`)
 - [Join our Discord](https://discord.com/invite/X4JWnZnxPb)
 - [Chat with our docs](https://chatg.pt/DWjSBZn)
 
